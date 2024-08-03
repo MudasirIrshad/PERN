@@ -34,7 +34,7 @@ app.post("/addTask", async (req, res) => {
   const addTask = await db.query(
     "INSERT INTO tasks (user_email, title, description) VALUES ($1, $2, $3) returning *",
     [user_email, title, description]
-  );  
+  );
   try {
     res.json(addTask.rows);
   } catch (err) {
@@ -42,6 +42,33 @@ app.post("/addTask", async (req, res) => {
     res.status(500).send("Error adding task");
   }
 });
+
+app.put("/updateTask", (req, res) => {
+  const { task_id, user_email, title, description } = req.body;
+  db.query(
+    "UPDATE tasks SET title=$1, description=$2 WHERE id=$3 AND user_email=$4",
+    [title, description, task_id, user_email]
+  );
+  try {
+    res.json("Update Successful");
+  } catch (err) {
+    console.error("Error updating task", err.stack);
+    res.status(500).send("Error updating task");
+  }
+});
+app.delete('/deleteTask',(req,res)=>{
+  const { task_id, user_email } = req.body;
+  db.query(
+    "DELETE FROM tasks WHERE id=$1 AND user_email=$2",
+    [task_id, user_email]
+  );
+  try {
+    res.json("Task deleted successfully");
+  } catch (err) {
+    console.error("Error deleting task", err.stack);
+    res.status(500).send("Error deleting task");
+  }
+})
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
