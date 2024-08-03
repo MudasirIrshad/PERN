@@ -29,6 +29,19 @@ app.get("/todos", async (req, res) => {
     res.status(500).send("Error fetching data");
   }
 });
+app.post("/addTask", async (req, res) => {
+  const { user_email, title, description } = req.body;
+  const addTask = await db.query(
+    "INSERT INTO tasks (user_email, title, description) VALUES ($1, $2, $3) returning *",
+    [user_email, title, description]
+  );  
+  try {
+    res.json(addTask.rows);
+  } catch (err) {
+    console.error("Error adding task", err.stack);
+    res.status(500).send("Error adding task");
+  }
+});
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
